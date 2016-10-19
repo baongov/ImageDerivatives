@@ -12,6 +12,43 @@ Mat CreateParodayMartrix(Mat input, int rows_h, int cols_h);
 Mat CrossCorrelation(Mat input, Mat h, double &max_out, double &min_out);
 Mat CrossConvolution(Mat input, Mat h, double &max_out, double &min_out);
 Mat Zero_crossing(Mat input, Mat h, int threshold);
+Mat CreateNxNMaxtrix(Mat input, int N);
+void forwardDFT(const double *s, const int &N, double *&a, double *&b)
+{
+    // note: this code is not optimised at all, written for clarity not speed.
+    for (int k = 0; k <= N / 2; ++k) {
+        a[k] = b[k] = 0;
+        for (int x = 0; x < N; ++x) {
+            a[k] += s[x] * cos(2 * M_PI / N * k * x);
+            b[k] += s[x] * sin(2 * M_PI / N * k * x);
+        }
+        // normalization
+        a[k] *= (k == 0 || k == N / 2) ? 1. / N : 2. / N;
+        b[k] *= 2. / N;
+    }
+}
+/************************************************************************/
+
+void inverseDFT(const double *a, const double *b, const int &N, double *&s)
+{
+    // note: this code is not optimised at all, written for clarity not speed.
+    for (int x = 0; x < N; ++x) {
+        s[x] = a[0];
+        for (int k = 1; k <= N / 2; ++k) {
+            s[x] += a[k] * cos(2 * M_PI / N * k * x) + b[k] * sin(2 * M_PI / N * k * x);
+        }
+    }
+}
+
+int min2k(int num)
+{
+  double log2num = log((double) num) / log(2.0);
+  int result = (int) log2num;
+  if (log2num - (double)result == 0.0)
+    return pow(2, result);
+  else
+    return pow(2, result + 1);
+}
 
 int main(int argc, char** argv )
 {
@@ -21,7 +58,7 @@ int main(int argc, char** argv )
         return -1;
     }
     //------Read and Display Image-------
-    Mat image;
+    Mat image, result_s;
     int rows, cols;
     image = imread( argv[1], CV_LOAD_IMAGE_COLOR );
     if ( !image.data )
@@ -36,11 +73,9 @@ int main(int argc, char** argv )
     cout << endl << "Please choose one of these options: " << endl;
     cout << "1. Display histogram" << endl;
     cout << "2. Box Filtering" << endl;
-    //cout << "3. Sharpening"
-    rows = image.rows;
-    cols = image.cols;
-    //-----Test CrossCorrelation-----
-    Mat grayImg, grayImg_d, h, l, result,result_s, zero_cross;
+
+
+    Mat grayImg, grayImg_d, h, l, result, zero_cross;
     double data_bf[3][3] = {{1,1,1},{1,1,1},{1,1,1}};
     double data_h[3][3] = {{-1,2,-1},{-1,2,-1},{-1,2,-1}};
     double data_l[5][5] = {
@@ -52,6 +87,51 @@ int main(int argc, char** argv )
     cvtColor(image, grayImg, CV_BGR2GRAY);
     //cover grayImg to CV_64F (double) before filtering
     grayImg.convertTo(grayImg_d, CV_64F);
+
+
+    //cout << "3. Sharpening"
+    rows = image.rows;
+    cols = image.cols;
+    int N = 0;
+    if (rows > cols)
+      N = min2k(rows);
+    else
+      N = min2k(cols);
+    cout << "min2k = " << N << endl;
+    //Transfer normal image to a NxN image
+    Mat nnMatrix = CreateNxNMaxtrix(grayImg_d, N);
+    nnMatrix.convertTo(result_s, CV_8UC1);
+    //DFT on each row
+    for (int i = 0; i < N; i++)
+    {
+      //init relevant varible
+      double *s_in = new double [N];
+      double *s_out = new double [N];
+      double *a = new double [N/2 + 1];
+      double *b = new double [N/2 + 1];
+      //read s_in from image at rows_i
+      for (int j = 0; j < N; j++)
+        *(s_in + j) = nnMatrix.at<double>(i, j);
+
+      forwardDFT(s_in, N, a, b);
+
+      for (int j = 0; j < N/2; j++)
+      {
+        nnMatrix.at<double>(i, j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
+        nnMatrix.at<double>(i, N - 1 - j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
+      }
+
+      inverseDFT(a, b, N, s_out);
+
+      //for (int j = 0; j < N; j++)
+        //nnMatrix.at<double>(i, j) = *(s_out + j);
+
+      delete[] s_in, s_out, a, b;
+    }
+    
+    /*
+    //-----Test CrossCorrelation-----
+
     h = Mat(3, 3, CV_64F, data_h);
     l = Mat(5, 5, CV_64F, data_l);
     //Result from CrossCorrelation 2 matrix grayImg and h (BoxFiltering)
@@ -63,14 +143,25 @@ int main(int argc, char** argv )
     zero_cross.convertTo(result_s, CV_8UC1);
     //-----histogram-----
     //ImageHistogramGray(image);
-
-
+    */
+    nnMatrix.convertTo(result_s, CV_8UC1);
     namedWindow("Display Input Image", WINDOW_AUTOSIZE );
     imshow("Display Input Image", result_s);
 
     waitKey(0);
 
     return 0;
+}
+
+Mat CreateNxNMaxtrix(Mat input, int N)
+{
+  int rows_i = input.rows;
+  int cols_i = input.cols;
+  Mat result = Mat::zeros(N, N, CV_64F);
+  for (int i = 0; i < rows_i; i++)
+    for (int j = 0; j < cols_i; j++)
+      result.at<double>(i,j) = input.at<double>(i,j);
+  return result;
 }
 Mat CreateParodayMartrix(Mat input, int rows_h, int cols_h)
 {

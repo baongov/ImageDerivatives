@@ -19,6 +19,7 @@ public:
   Mat ImageCorrelation(Mat h);
   Mat ImageConvolution(Mat h);
   Mat Zero_crossing(Mat h, int threshold);
+  Mat HistogramEqualization(Mat img);
   void forwardDFT(const double *s, const int &N, double *&a, double *&b);
   void inverseDFT(const double *a, const double *b, const int &N, double *&s);
 

@@ -50,6 +50,72 @@ int min2k(int num)
     return pow(2, result + 1);
 }
 
+Mat rowsDFT(Mat grayImg, int rows, int cols)
+{
+  int N = 0;
+  if (rows > cols)
+    N = min2k(rows);
+  else
+    N = min2k(cols);
+  cout << "min2k = " << N << endl;
+  //Transfer normal image to a NxN image
+  Mat nnMatrix = CreateNxNMaxtrix(grayImg, N);
+  //DFT on each row
+  for (int i = 0; i < N; i++)
+  {
+    //init relevant varible
+    double *s_in = new double [N];
+    double *s_out = new double [N];
+    double *a = new double [N/2 + 1];
+    double *b = new double [N/2 + 1];
+    //read s_in from image at rows_i
+    for (int j = 0; j < N; j++)
+      *(s_in + j) = nnMatrix.at<double>(i, j);
+
+    forwardDFT(s_in, N, a, b);
+
+    for (int j = 0; j < N/2; j++)
+    {
+      nnMatrix.at<double>(i, j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
+      nnMatrix.at<double>(i, N - 1 - j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
+    }
+
+    inverseDFT(a, b, N, s_out);
+
+    //for (int j = 0; j < N; j++)
+      //nnMatrix.at<double>(i, j) = *(s_out + j);
+
+    delete[] s_in, s_out, a, b;
+  }
+  return nnMatrix;
+}
+Mat HistogramEqualization(Mat grayImg)
+{
+  int histSize = 256;
+  float range[] = {0, 256};
+  const float* histRange = {range};
+  Mat result, histOut, grayImg_d;
+  int rows = grayImg.rows;
+  int cols = grayImg.cols;
+  grayImg.convertTo(grayImg_d, CV_64F);
+  calcHist(&grayImg, 1, 0, Mat(), histOut, 1, &histSize, &histRange, true, false); // Confingure histogram for grayscale
+  histOut.convertTo(histOut, CV_64F);
+  result = Mat::zeros(rows, cols, CV_64F);
+  for (int i = 0; i < 256; i++)
+  {
+    histOut.at<double>(i, 0) = histOut.at<double>(i, 0)/(rows*cols)*255;
+  }
+  for (int i = 1; i < 256; i++)
+  {
+    histOut.at<double>(i, 0) += histOut.at<double>(i-1, 0);
+  }
+  for (int i = 0; i < rows; i++)
+    for (int j = 0; j < cols; j++)
+    {
+      result.at<double>(i,j) = (int) histOut.at<double>((int)grayImg_d.at<double>(i,j), 0);
+    }
+  return result;
+}
 int main(int argc, char** argv )
 {
     if ( argc != 2 )
@@ -92,43 +158,8 @@ int main(int argc, char** argv )
     //cout << "3. Sharpening"
     rows = image.rows;
     cols = image.cols;
-    int N = 0;
-    if (rows > cols)
-      N = min2k(rows);
-    else
-      N = min2k(cols);
-    cout << "min2k = " << N << endl;
-    //Transfer normal image to a NxN image
-    Mat nnMatrix = CreateNxNMaxtrix(grayImg_d, N);
-    nnMatrix.convertTo(result_s, CV_8UC1);
-    //DFT on each row
-    for (int i = 0; i < N; i++)
-    {
-      //init relevant varible
-      double *s_in = new double [N];
-      double *s_out = new double [N];
-      double *a = new double [N/2 + 1];
-      double *b = new double [N/2 + 1];
-      //read s_in from image at rows_i
-      for (int j = 0; j < N; j++)
-        *(s_in + j) = nnMatrix.at<double>(i, j);
 
-      forwardDFT(s_in, N, a, b);
-
-      for (int j = 0; j < N/2; j++)
-      {
-        nnMatrix.at<double>(i, j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
-        nnMatrix.at<double>(i, N - 1 - j) = 255*sqrt(pow(*(a+j),2) + pow(*(b+j),2));
-      }
-
-      inverseDFT(a, b, N, s_out);
-
-      //for (int j = 0; j < N; j++)
-        //nnMatrix.at<double>(i, j) = *(s_out + j);
-
-      delete[] s_in, s_out, a, b;
-    }
-    
+    result = HistogramEqualization(grayImg);
     /*
     //-----Test CrossCorrelation-----
 
@@ -144,7 +175,7 @@ int main(int argc, char** argv )
     //-----histogram-----
     //ImageHistogramGray(image);
     */
-    nnMatrix.convertTo(result_s, CV_8UC1);
+    result.convertTo(result_s, CV_8UC1);
     namedWindow("Display Input Image", WINDOW_AUTOSIZE );
     imshow("Display Input Image", result_s);
 

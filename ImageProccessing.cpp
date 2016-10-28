@@ -18,9 +18,9 @@ void ImageProccessing::ConvertToPixelMatrix(Mat &mat){
   for (int i = 0; i < mat.rows; i++)
     for (int j = 0; j < mat.cols; j++){
       if (mat.at<double>(i,j) > max_out)
-        maxPixel = mat.at<double>(i,j;
+        maxPixel = mat.at<double>(i,j);
       if (mat.at<double>(i,j) < min_out)
-        minPixel = mat.at<double>(i,j;
+        minPixel = mat.at<double>(i,j);
     }
 
   //Covert matrix to pixel colors

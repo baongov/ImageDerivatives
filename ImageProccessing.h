@@ -13,7 +13,6 @@ class ImageProccessing
 {
   Mat img;
   int rows, cols;
-  double minPixel, maxPixel;
 
 public:
   ImageProccessing(Mat img)
@@ -26,7 +25,7 @@ public:
 
 private:
   Mat CreateParodayMartrix(int height, int weight); //Create Paroday Martrix of image that corresponds to a Matrix H size rows_h x cols_h
-  Mat CreateNxNMaxtrix(int N); //CreateNxNMaxtrix from image
-  Mat CrossCorrelation(Mat h, double &max_out, double &min_out);
-  Mat CrossConvolution(Mat h, double &max_out, double &min_out);
+  Mat CreatePadingMaxtrix(int N); //CreateNxNMaxtrix from image
+  Mat CrossCorrelation(Mat h);
+  Mat CrossConvolution(Mat h);
 }

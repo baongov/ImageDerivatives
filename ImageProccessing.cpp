@@ -17,9 +17,9 @@ void ImageProccessing::ConvertToPixelMatrix(Mat &mat){
   //Identify min and max from given matrix
   for (int i = 0; i < mat.rows; i++)
     for (int j = 0; j < mat.cols; j++){
-      if (mat.at<double>(i,j) > max_out)
+      if (mat.at<double>(i,j) > maxPixel)
         maxPixel = mat.at<double>(i,j);
-      if (mat.at<double>(i,j) < min_out)
+      if (mat.at<double>(i,j) < minPixel)
         minPixel = mat.at<double>(i,j);
     }
 
@@ -33,7 +33,7 @@ Mat ImageProccessing::CreateParodayMartrix(int height, int weight){
   Mat parody = Mat::zeros(rows + 2*height - 2, cols + 2*weight - 2 , CV_64F);
   for (int i = 0; i < rows; i++)
     for (int j = 0; j < cols; j++)
-      parody.at<double>(i + height - 1,j + weight - 1) = input.at<double>(i,j);
+      parody.at<double>(i + height - 1,j + weight - 1) = img.at<double>(i,j);
 
   return parody;
 }
@@ -42,7 +42,7 @@ Mat ImageProccessing::CreatePadingMaxtrix(int n){
   Mat result = Mat::zeros(n, n, CV_64F);
   for (int i = 0; i < rows; i++)
     for (int j = 0; j < cols; j++)
-      result.at<double>(i,j) = input.at<double>(i,j);
+      result.at<double>(i,j) = img.at<double>(i,j);
   return result;
 }
 
@@ -61,11 +61,6 @@ Mat ImageProccessing::CrossCorrelation(Mat h){
         for (int y = 0; y < cols_h; y++)
           sum += h.at<double>(x,y)*parody_I.at<double>(i+x,j+y);
       result.at<double>(i,j) = sum;
-      //Store max value for calculating pixel colors
-      if (sum > max_out)
-        maxPixel = sum;
-      if (sum < min_out)
-        minPixel = sum;
     }
 
   ConvertToPixelMatrix(result);

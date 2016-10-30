@@ -77,3 +77,31 @@ Mat ImageProccessing::CrossConvolution(Mat h){
   flip(h, hFlip, 1);
   return CrossCorrelation(hFlip);
 }
+
+void ImageProccessing::ImageHistogramGray()
+{
+  int histSize = 256;
+  float range[] = {0, 256};
+  const float* histRange = {range};
+  Mat grayImg, histOut;
+
+  cvtColor(img, grayImg, CV_BGR2GRAY);  //Convert image input into grayscale
+  calcHist(&grayImg, 1, 0, Mat(), histOut, 1, &histSize, &histRange, true, false); // Confingure histogram for grayscale
+
+  //Create an image to display histogram
+  int hist_w = 512; int hist_h = 400;
+  int bin_w = cvRound((double) hist_w/histSize);
+  Mat histImage(hist_w, hist_h, CV_8U, Scalar(0,0,0));
+  //Normalize the histogram
+  normalize(histOut, histOut, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  //Draw grayscale
+  for(int i = 1; i < histSize; i++)
+  {
+    line(histImage, Point( bin_w*(i-1), hist_h - cvRound(histOut.at<float>(i-1)) ) ,
+                     Point( bin_w*(i), hist_h - cvRound(histOut.at<float>(i)) ),
+                     Scalar( 255, 0, 0), 2, 8, 0  );
+  }
+  //Display histogram through Window
+  namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE );
+  imshow("calcHist Demo", histImage );
+}

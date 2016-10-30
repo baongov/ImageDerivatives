@@ -8,7 +8,7 @@
  #include <iostream>
  #include <math.h>
 
-class ImageProccessing{
+class FourierTransformation{
 public:
   void forwardDFT(const double *s, const int &N, double *&a, double *&b);
   void inverseDFT(const double *a, const double *b, const int &N, double *&s);

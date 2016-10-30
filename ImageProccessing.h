@@ -28,6 +28,7 @@ public:
     Mat CreatePadingMaxtrix(int N); //CreateNxNMaxtrix from image
     Mat CrossCorrelation(Mat h);
     Mat CrossConvolution(Mat h);
+    void ImageHistogramGray();
 private:
     void ConvertToPixelMatrix(Mat &mat);
 };

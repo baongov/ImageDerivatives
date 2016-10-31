@@ -51,8 +51,8 @@ Mat PerpectiveMatrix(Mat input, Mat output)
     a.at<double>(i,3) = 0;
     a.at<double>(i,4) = 0;
     a.at<double>(i,5) = 0;
-    a.at<double>(i,6) = output.at<double>(0,i/2) * input.at<double>(0,i/2);
-    a.at<double>(i,7) = output.at<double>(0,i/2) * input.at<double>(1,i/2);
+    a.at<double>(i,6) = - output.at<double>(0,i/2) * input.at<double>(0,i/2);
+    a.at<double>(i,7) = - output.at<double>(0,i/2) * input.at<double>(1,i/2);
     //y'
     a.at<double>(i+1,0) = 0;
     a.at<double>(i+1,1) = 0;
@@ -60,8 +60,8 @@ Mat PerpectiveMatrix(Mat input, Mat output)
     a.at<double>(i+1,3) = input.at<double>(0,i/2); //=x
     a.at<double>(i+1,4) = input.at<double>(1,i/2); //=y
     a.at<double>(i+1,5) = 1;
-    a.at<double>(i+1,6) = output.at<double>(1,i/2) * input.at<double>(0,i/2);
-    a.at<double>(i+1,7) = output.at<double>(1,i/2) * input.at<double>(1,i/2);
+    a.at<double>(i+1,6) = - output.at<double>(1,i/2) * input.at<double>(0,i/2);
+    a.at<double>(i+1,7) = - output.at<double>(1,i/2) * input.at<double>(1,i/2);
   }
   cout << a<< endl;
   cout << b << endl;
@@ -89,7 +89,7 @@ Mat Geometric(Mat image)
   Mat xy_ = Mat(3, 4, CV_64F, output);
 
   perpective = PerpectiveMatrix(xy, xy_);
-  warpPerspective(image, result, perpective.t(), Size(500,500));
+  warpPerspective(image, result, perpective, Size(500,500));
   result.convertTo(result, CV_8UC1);
   return result;
 }

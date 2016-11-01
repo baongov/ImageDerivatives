@@ -1,6 +1,7 @@
 #include "EdgeDetection.h"
+#include "ImageProccessing.h"
 
-Mat EdgeDetection::Zero_crossing(Mat input, Mat h, int threshold){
+Mat EdgeDetection::ZeroCrossing(Mat input, Mat h, int threshold){
   int rows_i = input.rows;
   int cols_i = input.cols;
   int rows_h = h.rows;

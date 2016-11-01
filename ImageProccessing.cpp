@@ -26,7 +26,7 @@ void ImageProccessing::ConvertToPixelMatrix(Mat &mat){
   //Covert matrix to pixel colors
   for (int i = 0; i < mat.rows; i++)
     for (int j = 0; j < mat.cols; j++)
-      mat.at<double>(i,j) = int((mat.at<double>(i,j) - minPixel)/ (maxPixel - minPixel) * 255);
+        mat.at<double>(i,j) = int((mat.at<double>(i,j) - minPixel)/ (maxPixel - minPixel) * 255);
 }
 
 Mat ImageProccessing::CreateParodayMartrix(int height, int weight){

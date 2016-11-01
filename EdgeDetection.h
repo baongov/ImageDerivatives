@@ -10,5 +10,5 @@
 
 class EdgeDetection{
 public:
-  Mat Zero_crossing(Mat input, Mat h, int threshold);
+  Mat ZeroCrossing(Mat input, Mat h, int threshold);
 }

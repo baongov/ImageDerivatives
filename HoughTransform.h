@@ -8,4 +8,4 @@ using namespace std;
 
 #define PI 3.14159265358
 
-void ineDectect(Mat edgeMap, const int m, const int n, int &k, int* &theta, int* &p);
+void LineDectect(Mat edgeMap, const int m, const int n, int &k, double* &theta, double* &p);

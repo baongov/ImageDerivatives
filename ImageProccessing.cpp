@@ -6,7 +6,7 @@
 
 #include "ImageProccessing.h"
 
-void ImageProccessing::ConvertToPixelMatrix(Mat &mat){
+void ConvertToPixelMatrix(Mat &mat){
   /**
    * Format matrix by setting its value to be in [0, 255]
    */

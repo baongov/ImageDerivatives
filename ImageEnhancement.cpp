@@ -1,6 +1,6 @@
 #include "ImageEnhancement.h"
-
-Mat ImageEnhancement::HistogramEqualization()
+#include "ImageProccessing.h"
+Mat HistogramEqualization(Mat grayImg)
 {
   int histSize = 256;
   float range[] = {0, 256};
@@ -26,4 +26,28 @@ Mat ImageEnhancement::HistogramEqualization()
       result.at<double>(i,j) = (int) histOut.at<double>((int)grayImg_d.at<double>(i,j), 0);
     }
   return result;
+}
+
+void LogTransform(Mat &grayImg, double a)
+{
+    for (int i = 0; i < grayImg.rows; i++)
+      for (int j = 0; j < grayImg.cols; j++)
+      {
+         int val = grayImg.at<double>(i,j);
+         grayImg.at<double>(i,j) = a * log(1 + val);
+      }
+
+    ConvertToPixelMatrix(grayImg);
+}
+
+void GammaCorrection(Mat &grayImg, double a, double gamma)
+{
+  for (int i = 0; i < grayImg.rows; i++)
+    for (int j = 0; j < grayImg.cols; j++)
+    {
+       int val = grayImg.at<double>(i,j);
+       grayImg.at<double>(i,j) = a * pow(val, gamma);
+    }
+
+  ConvertToPixelMatrix(grayImg);
 }

@@ -8,7 +8,8 @@
  #include <iostream>
  #include <math.h>
 
-class ImageEnhancement{
-public:
-  Mat HistogramEqualization()
-}
+using namespace cv;
+
+Mat HistogramEqualization(Mat grayImg);
+void LogTransform(Mat &grayImg, double a);
+void GammaCorrection(Mat &grayImg, double a, double gamma);

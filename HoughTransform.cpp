@@ -7,6 +7,7 @@ double delP;
 
 #define M 300
 #define N 300
+#define P 300
 
 void printArray(int **accum, int m, int n)
 {
@@ -16,6 +17,16 @@ void printArray(int **accum, int m, int n)
       cout << accum[i][j] << " ";
     cout << endl;
   }
+}
+
+double idx2theta(int idx)
+{
+  return minT + idx * delT + delT/2.0;
+}
+
+double idx2pro(int idx)
+{
+  return minP + idx * delP + delP/2.0;
 }
 
 void CompAccumulator(Mat &edgeMap, int **&accum, int m, int n)
@@ -42,7 +53,7 @@ void CompAccumulator(Mat &edgeMap, int **&accum, int m, int n)
       {
         for (int j = 0; j < M; j++)
         {
-          double theta = minT + j * delT + delT/2.0;
+          double theta = idx2theta(j);
           double p = x * cos(theta) + y * sin(theta);
           int i = round((p - minP)/delP);
           if (i >= N) continue;
@@ -119,8 +130,8 @@ void FindMaxima(int **&accum, int m, int n, double* &theta, double* &p, int &k)
   k = idx;
   for (int i = 0 ; i < k; i ++)
   {
-    theta[i] = minT + *(*(kmax + 1)+ i) * delT + delT/2.0;
-    p[i] = minP + *(*(kmax + 2)+ i) * delP + delP/2.0;
+    theta[i] = idx2theta(*(*(kmax + 1)+ i));
+    p[i] = idx2pro(*(*(kmax + 2)+ i));
   }
 }
 

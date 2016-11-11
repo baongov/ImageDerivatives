@@ -13,10 +13,10 @@ using namespace cv;
 
 class ImageProccessing
 {
+public:
   Mat img;
   int rows, cols;
 
-public:
    ImageProccessing(Mat img)
    {
        this->img = img;
@@ -29,6 +29,6 @@ public:
     Mat CrossCorrelation(Mat h);
     Mat CrossConvolution(Mat h);
     void ImageHistogramGray();
-private:
-    void ConvertToPixelMatrix(Mat &mat);
 };
+
+void ConvertToPixelMatrix(Mat &mat);

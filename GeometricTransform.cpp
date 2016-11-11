@@ -1,5 +1,26 @@
 #include "GeometricTransform.h"
 
+void PolarTransform(Mat image, Mat &result, Point pCen , int rMax)
+{
+  int rows_r = result.rows;
+  int cols_r = result.cols;
+  int rMin = rMax - result.rows; //70 - 50 = 20
+  cout << "map points" <<endl;
+  for (int i = 0; i < cols_r; i++)
+  {
+    double theta = 2*PI/cols_r*i;
+    for (int j = 0; j < rows_r; j++)
+    {
+      int x = pCen.x + (j + rMin)*cos(theta);
+      int y = pCen.y + (j + rMin)*sin(theta);
+      //cout << x << " " << y << " " << image.rows << " " <<image.cols << endl;
+      //cout << j << " " << i << " " << result.rows << " " << result.cols << endl;
+      result.at<cv::Vec3b>(j,i) = image.at<cv::Vec3b>(x, y);
+    }
+  }
+  cout << "finish map points" <<endl;
+}
+
 Mat PerpectiveMatrix(Mat input, Mat output)
 {
   //if (input.cols != 4 && input.cols != output.cols) return null;
@@ -31,8 +52,6 @@ Mat PerpectiveMatrix(Mat input, Mat output)
     a.at<double>(i+1,6) = - output.at<double>(1,i/2) * input.at<double>(0,i/2);
     a.at<double>(i+1,7) = - output.at<double>(1,i/2) * input.at<double>(1,i/2);
   }
-  cout << a<< endl;
-  cout << b << endl;
   c = a.inv(0)*b;
 
   for (int i = 0; i < 8; i++)
@@ -44,24 +63,4 @@ Mat PerpectiveMatrix(Mat input, Mat output)
   perpective.at<double>(2, 2) = 1;
 
   return perpective;
-}
-
-Mat Geometric(Mat image)
-{
-  Mat grayImg, result, perpective;
-  image.convertTo(image, CV_64F);
-  //Corresponding pairs pf points
-  double input[3][4] = {{86, 454, 20, 398},
-                        {100, 32, 315, 353},
-                        {1, 1, 1, 1}};
-  double output[3][4] = {{0, 500, 0, 500},
-                         {0, 0, 500, 500},
-                         {1, 1, 1, 1}};
-  Mat xy = Mat(3, 4, CV_64F, input);
-  Mat xy_ = Mat(3, 4, CV_64F, output);
-
-  perpective = PerpectiveMatrix(xy, xy_);
-  warpPerspective(image, result, perpective, Size(500,500));
-  result.convertTo(result, CV_8UC1);
-  return result;
 }

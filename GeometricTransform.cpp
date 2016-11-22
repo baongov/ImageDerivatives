@@ -64,3 +64,72 @@ Mat PerpectiveMatrix(Mat input, Mat output)
 
   return perpective;
 }
+
+void ForwardMapping(Mat input, Mat &output, Mat perpective, Size size){
+  int rows = input.rows;
+  int cols = input.cols;
+  int px, py;
+
+  output = Mat::zeros(size, CV_8UC3);
+
+  for (int i = 0; i < rows ; i++)
+    for (int j = 0; j < cols; j++)
+    {
+      double dataP[3][1] =  {{i},{j},{1}};
+      Mat P = Mat(3, 1 , CV_64F, dataP);
+      Mat P_ = perpective * P ;
+
+        px = round(P_.at<double>(0, 0)/P_.at<double>(2, 0));
+        py = round(P_.at<double>(1, 0)/P_.at<double>(2, 0));
+        //cout << P_ << endl;
+
+      if (px >= 0 && px <= output.rows && py >= 0 && py <= output.cols)
+      {
+        // Vec3b &intensityI = input.at<Vec3b>(i, j);
+        // Vec3b &intensityO = output.at<Vec3b>(px, py);
+        //cout << px << " " << py << endl;
+        output.at<Vec3b>(px, py) = input.at<Vec3b>(i, j);
+        // intensityO.val[0] = intensityI.val[0];
+        // intensityO.val[1] = intensityI.val[1];
+        // intensityO.val[2] = intensityI.val[2];
+        //cout << input.at<Vec3b>(i, j) << endl;
+      }
+      if (i == 20 && j == 315)
+      {
+        cout << px << " " << py;
+        cout << input.at<Vec3b>(i, j) << endl;
+        cout << output.at<Vec3b>(px, py) << endl;
+      }
+    }
+}
+
+void BackwardMapping(Mat input, Mat &output, Mat perpective, Size size){
+  int rows = size.width;
+  int cols = size.height;
+  int px, py;
+  cout << rows << " " << cols << endl;
+  output = Mat::zeros(size, CV_8UC3);
+  for (int i = 0; i < rows ; i++)
+    for (int j = 0; j < cols; j++)
+    {
+      double dataP_[3][1] =  {{i},{j},{1}};
+      Mat P_ = Mat(3, 1 , CV_64F, dataP_);
+      Mat P = perpective.inv(0) * P_ ;
+
+
+      py = round(P.at<double>(0, 0)/P.at<double>(2, 0));
+      px = round(P.at<double>(1, 0)/P.at<double>(2, 0));
+
+      if (px >= 0 && px <= input.rows && py >= 0 && py <= input.cols)
+      {
+        output.at<Vec3b>(j, i) = input.at<Vec3b>(px, py);
+      }
+
+      if (i == 450 && j == 280)
+      {
+        cout << px << " " << py;
+        cout << output.at<Vec3b>(i, j) << endl;
+        cout << input.at<Vec3b>(px, py) << endl;
+      }
+    }
+}

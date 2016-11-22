@@ -7,3 +7,5 @@ using namespace std;
 Mat Geometric(Mat image);
 Mat PerpectiveMatrix(Mat input, Mat output);
 void PolarTransform(Mat image, Mat &result, Point pCen , int rMax);
+void ForwardMapping(Mat input, Mat &output, Mat perpective, Size size);
+void BackwardMapping(Mat input, Mat &output, Mat perpective, Size size);

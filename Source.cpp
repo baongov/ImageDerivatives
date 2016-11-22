@@ -110,7 +110,7 @@ Mat Polar(Mat image){
 
 Mat Geometric(Mat image){
   Mat grayImg, result, perpective;
-  image.convertTo(image, CV_64F);
+  //image.convertTo(image, CV_8U);
   //Corresponding pairs pf points
   double input[3][4] = {{86, 454, 20, 398},
                         {100, 32, 315, 353},
@@ -123,7 +123,10 @@ Mat Geometric(Mat image){
 
   perpective = PerpectiveMatrix(xy, xy_);
   warpPerspective(image, result, perpective, Size(500,500));
-  result.convertTo(result, CV_8UC1);
+  //ForwardMapping(image, result, perpective, Size(500,500));
+  //BackwardMapping(image, result, perpective, Size(500,500));
+  circle(result, Point(450, 280), 2 , Scalar(255,255,0), 2, 8, 0);
+  //result.convertTo(result, CV_8UC1);
   return result;
 }
 
@@ -174,7 +177,7 @@ int main(int argc, char** argv )
 
 
     namedWindow("Display Input Image", WINDOW_AUTOSIZE );
-    imshow("Display Input Image", FourierTransform(image));
+    imshow("Display Input Image", Geometric(image));
 
     waitKey(0);
     return 0;
